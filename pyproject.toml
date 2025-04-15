@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["L1vDev <livdev.rguez@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -14,6 +15,9 @@ django-cloudinary-storage = "^0.3.0"
 python-decouple = "^3.8"
 python-dotenv = "^1.1.0"
 pillow = "^11.1.0"
+django-filter = "^25.1"
+whitenoise = "^6.9.0"
+django-cors-headers = "^4.7.0"
 
 
 [build-system]
