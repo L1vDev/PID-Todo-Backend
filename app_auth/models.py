@@ -5,8 +5,8 @@ from app_auth.utils import get_unique_filename
 import uuid
 
 class User(AbstractBaseUser):
-    id=models.CharField(primary_key=True,default=uuid.uuid4, verbose_name="ID")
-    username=models.CharField(unique=True,verbose_name="Nombre de Usuario")
+    id=models.CharField(primary_key=True,default=uuid.uuid4, verbose_name="ID", max_length=60)
+    username=models.CharField(unique=True,verbose_name="Nombre de Usuario",max_length=50)
     email=models.EmailField(unique=True,verbose_name="Email")
     picture=models.ImageField(upload_to=get_unique_filename,blank=True,null=True,verbose_name="Foto de Perfil")
     cloud_url=models.URLField(verbose_name="Link de la Imagen",null=True,blank=True)

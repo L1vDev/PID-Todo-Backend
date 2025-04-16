@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('password', models.CharField(max_length=128, verbose_name='password')),
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('id', models.CharField(default=uuid.uuid4, primary_key=True, serialize=False, verbose_name='ID')),
-                ('username', models.CharField(unique=True, verbose_name='Nombre de Usuario')),
+                ('id', models.CharField(default=uuid.uuid4, primary_key=True, serialize=False, verbose_name='ID',max_length=60)),
+                ('username', models.CharField(unique=True, verbose_name='Nombre de Usuario',max_length=50)),
                 ('email', models.EmailField(max_length=254, unique=True, verbose_name='Email')),
                 ('picture', models.ImageField(blank=True, null=True, upload_to=app_auth.utils.get_unique_filename, verbose_name='Foto de Perfil')),
                 ('cloud_url', models.URLField(blank=True, null=True, verbose_name='Link de la Imagen')),
