@@ -90,25 +90,33 @@ WSGI_APPLICATION = 'todo_pid.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Postgres SQL
+# # Postgres SQL
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DATABASE_NAME', default='todo_pid'),
+#         'USER': config('DATABASE_USER', default='postgres'),
+#         'PASSWORD': config('POSTGRES_PASSWORD', default='postgres'),
+#         'HOST': config('POSTGRES_HOST', default='127.0.0.1'),
+#         'PORT': config('POSTGRES_PORT', default='5432'),
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_NAME', default='todo_pid'),
-        'USER': config('DATABASE_USER', default='postgres'),
-        'PASSWORD': config('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': config('POSTGRES_HOST', default='127.0.0.1'),
-        'PORT': config('POSTGRES_PORT', default='5432'),
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-# Email config
-# EMAIL_BACKEND = config("EMAIL_BACKEND")
-# EMAIL_HOST = config("EMAIL_HOST")
-# EMAIL_HOST_USER = config('EMAIL_HOST_USER')  
-# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
+
+#Email config
+EMAIL_BACKEND = config("EMAIL_BACKEND")
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')  
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
