@@ -48,10 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'cloudinary_storage',
     'cloudinary',
-    'app_auth'
+    'app_auth',
+    'app_projects',
 ]
 
 MIDDLEWARE = [
@@ -166,7 +167,6 @@ AUTH_USER_MODEL='app_auth.User'
 
 AUTHENTICATION_BACKENDS = [
     'app_auth.backends.EmailOrUsernameBackend', 
-    'django.contrib.auth.backends.ModelBackend', 
 ]
 
 REST_FRAMEWORK = {
@@ -222,4 +222,4 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 }
 
-
+SITE_NAME="Todo PID"

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -6,26 +7,6 @@ import jwt
 import datetime
 import os
 import uuid
-
-def user_badge_callback(request):
-    from app_auth.models import Report_User_List
-    notification_count = Report_User_List.objects.filter(readed=False).count()
-    return f"{notification_count}"
-
-def team_badge_callback(request):
-    from app_auth.models import Report_Team_List
-    notification_count = Report_Team_List.objects.filter(readed=False).count()
-    return f"{notification_count}"
-
-def user_solicitud_badge_callback(request):
-    from app_events.models import User_Solicitud_Admin
-    notification_count = User_Solicitud_Admin.objects.filter(status="pending").count()
-    return f"{notification_count}"
-
-def team_solicitud_badge_callback(request):
-    from app_events.models import Team_Solicitud_Admin
-    notification_count = Team_Solicitud_Admin.objects.filter(status="pending").count()
-    return f"{notification_count}"
 
 def send_verification_email(user,url):
     subject = f'Verifica tu correo electrónico en {settings.SITE_NAME}'
@@ -67,8 +48,9 @@ def send_reset_password_email(user,url):
 
 def generate_token(user):
     payload = {
+        'user_id':str(user.id),
         'user_email': user.email,
-        'exp': datetime.datetime.now() + datetime.timedelta(minutes=30)  # token expira en 30 minutos
+        'exp': timezone.now() + datetime.timedelta(minutes=10)  # token expires in 10 minutes
     }
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
     return token
@@ -86,10 +68,6 @@ def get_unique_filename(instance, filename):
     model_name = instance.__class__.__name__.lower()
     folder_mapping = {
         'user': 'users/',
-        'games': 'games/',
-        'team':'team/',
-        'news': 'news/',
-        'shopitem': 'shop/',
         'default': 'others/',
     }
     try:

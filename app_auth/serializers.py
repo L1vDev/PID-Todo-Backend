@@ -55,7 +55,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
         # URL to reset the password
-        reset_url = f"{request.scheme}://{request.get_host()}/reset-password/confirm/{uid}/{token}/"
+        reset_url = f"{request.scheme}://{request.get_host()}/password/reset/confirm/{uid}/{token}/"
 
         try:
             send_reset_password_email(user,reset_url)

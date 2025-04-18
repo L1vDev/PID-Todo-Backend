@@ -19,29 +19,31 @@ class User(AbstractBaseUser):
         return self.username
         
     def save(self, *args, **kwargs):
-        if self.pk:
-            user_obj=User.objects.get(pk=self.pk)
-            if user_obj.picture:
-                if self.picture and self.picture != user_obj.picture:
-                    cloudinary.uploader.destroy(user_obj.cloud_id,resource_type="image")
-                    upload_result = cloudinary.uploader.upload(self.picture)
-                    self.cloud_id=upload_result['public_id']
-                    self.cloud_url = upload_result['secure_url']
-                elif not self.picture:
-                    cloudinary.uploader.destroy(user_obj.cloud_id,resource_type="image")
-                    self.cloud_id=None
-                    self.cloud_url=None
+        try:
+            if self.pk:
+                user_obj=User.objects.get(pk=self.pk)
+                if user_obj.picture:
+                    if self.picture and self.picture != user_obj.picture:
+                        cloudinary.uploader.destroy(user_obj.cloud_id,resource_type="image")
+                        upload_result = cloudinary.uploader.upload(self.picture)
+                        self.cloud_id=upload_result['public_id']
+                        self.cloud_url = upload_result['secure_url']
+                    elif not self.picture:
+                        cloudinary.uploader.destroy(user_obj.cloud_id,resource_type="image")
+                        self.cloud_id=None
+                        self.cloud_url=None
+                else:
+                    if self.picture:
+                        upload_result = cloudinary.uploader.upload(self.picture)
+                        self.cloud_id=upload_result['public_id']
+                        self.cloud_url = upload_result['secure_url']
             else:
                 if self.picture:
                     upload_result = cloudinary.uploader.upload(self.picture)
                     self.cloud_id=upload_result['public_id']
                     self.cloud_url = upload_result['secure_url']
-        else:
-            if self.picture:
-                upload_result = cloudinary.uploader.upload(self.picture)
-                self.cloud_id=upload_result['public_id']
-                self.cloud_url = upload_result['secure_url']
-
+        except Exception as e:
+            print(str(e))
         super().save(*args, **kwargs)
     class Meta:
         verbose_name="Usuario"

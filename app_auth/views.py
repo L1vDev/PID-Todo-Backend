@@ -19,6 +19,15 @@ class UserAccountView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+    
+    def update(self, request, *args, **kwargs):
+        #update can be partial
+        partial = kwargs.pop('partial', True)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class RegisterView(generics.CreateAPIView):
     queryset=User.objects.all()
@@ -30,11 +39,9 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save() 
         
         token=generate_token(user)
-        user.verification_token=token
         
-        user.save()
         origin = request.META.get('HTTP_ORIGIN', 'Unknown')
-        verification_url = f"{origin}/auth/verify-email/{user.verification_token}/{user.email}"
+        verification_url = f"{origin}/auth/verify-email/{token}"
         send_verification_email(user,verification_url)
         
         return Response({
@@ -54,12 +61,9 @@ class LoginView(APIView):
             if user:
                 if not user.is_email_verified:
                     token=generate_token(user)
-                    user.verification_token=token
-                    user.save()
-                    user.refresh_from_db()
                     origin = request.META.get('HTTP_ORIGIN', 'Unknown')
 
-                    verification_url = f"{origin}/auth/verify-email/{user.verification_token}/{user.email}"
+                    verification_url = f"{origin}/auth/verify-email/{token}"
                     send_verification_email(user,verification_url)
                     return Response({"error": "Credenciales incorrectas, se ha enviado un correo de verificación"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -71,19 +75,20 @@ class LoginView(APIView):
         return Response({"error": "Credenciales incorrectas"}, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyEmailView(APIView):
-    def get(self, request):
-        token = request.GET.get('token')
-        email = request.GET.get('email')
-        user = User.objects.filter(verification_token=token,email=email).first()
-        payload,token_is_valid=verify_token(token)
-        if not token_is_valid:
-            return Response({'message': 'Token expirado'},status=status.HTTP_401_UNAUTHORIZED)
-    
-        if user:
-            user.is_email_verified = True
-            user.save()
-            return Response({'message': 'Correo verificado con éxito!'},status=status.HTTP_200_OK)
-        return Response({'message': 'Token no valido'},status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, token):
+        try:
+            payload,token_is_valid=verify_token(token)
+            if not token_is_valid:
+                return Response({'details': 'Token expirado',"error":"invalid_token"},status=status.HTTP_401_UNAUTHORIZED)
+        
+            user = User.objects.filter(pk=payload["user_id"]).first()
+            if user:
+                user.is_email_verified = True
+                user.save()
+                return Response({'details': 'Correo verificado con éxito!'},status=status.HTTP_200_OK)
+            return Response({'details': 'Token no valido',"error":"invalid_token"},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"details":str(e),"error":"server_error"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
