@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'corsheaders',
+    'drf_yasg',
     'app_auth',
     'app_projects',
 ]
