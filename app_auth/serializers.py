@@ -7,7 +7,7 @@ from django.utils.encoding import force_bytes
 
 class UserSerializer(serializers.ModelSerializer):
     password=serializers.CharField(write_only=True)
-    picture=serializers.ImageField(write_only=True,allow_null=True)
+    picture=serializers.ImageField(write_only=True,allow_null=True,required=False)
     picture_url=serializers.SerializerMethodField()
     class Meta:
         model=User

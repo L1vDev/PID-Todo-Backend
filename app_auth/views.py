@@ -37,7 +37,7 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save() 
-        
+        user.save()
         token=generate_token(user)
         
         origin = request.META.get('HTTP_ORIGIN', 'Unknown')

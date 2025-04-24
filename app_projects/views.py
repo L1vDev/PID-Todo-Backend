@@ -1,4 +1,4 @@
-from datetime import timezone
+from django.utils import timezone
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -7,9 +7,11 @@ from app_projects.serializers import ProjectSerializer
 from rest_framework.response import Response
 
 class ProjectListCreateView(generics.ListCreateAPIView):
-    queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Project.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -24,7 +26,7 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            partial = kwargs.pop('partial', False)
+            partial = kwargs.pop('partial', True)
             instance = self.get_object()
             if instance.status!='planning' and request.data.get('status')=='planning':
                 return Response({"detail":"No se puede cambiar el estado de un proyecto en curso a planificación","error":"cant_change_status"}, status=status.HTTP_400_BAD_REQUEST)

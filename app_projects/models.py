@@ -10,7 +10,7 @@ class Project(models.Model):
     ]
     id = models.CharField(primary_key=True, default=uuid4, editable=False, verbose_name="ID", max_length=60)
     user=models.ForeignKey('app_auth.User', on_delete=models.CASCADE, verbose_name="Usuario", related_name="projects")
-    name = models.CharField(max_length=100, verbose_name="Nombre del Proyecto")
+    name = models.CharField(max_length=100, verbose_name="Nombre del Proyecto",unique=True)
     description = models.TextField(verbose_name="Descripción del Proyecto",null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de Actualización")

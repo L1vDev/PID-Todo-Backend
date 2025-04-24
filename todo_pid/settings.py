@@ -34,7 +34,16 @@ SECRET_KEY = 'django-insecure-5^$0@x%8#vmz%l4$yb(k*8(5+ahdc90hxd*#g8zy_#_7(ug^w9
 DEBUG = config("DEBUG",default=True,cast=bool)
 WHITENOISE_MANIFEST_STRICT = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://synchrony-puce.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8000",
+    "https://pid-todo-backend.onrender.com",
+    ]
 
 
 # Application definition
@@ -51,6 +60,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'cloudinary_storage',
     'cloudinary',
+    'corsheaders',
     'app_auth',
     'app_projects',
 ]
