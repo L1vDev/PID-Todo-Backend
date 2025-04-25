@@ -17,6 +17,7 @@ class Project(models.Model):
     finished_at = models.DateTimeField(verbose_name="Fecha de Finalización",null=True)
     end_date = models.DateField(verbose_name="Fecha de Fin",null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='planning', verbose_name="Estado")
+    favorite = models.BooleanField(default=False, verbose_name="Favorito")
     
     def __str__(self):
         return self.name

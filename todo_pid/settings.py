@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'app_auth',
     'app_projects',
+    'app_tasks'
 ]
 
 MIDDLEWARE = [

@@ -5,7 +5,7 @@ from django.utils import timezone
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['id', 'user', 'name', 'description', 'created_at', 'finished_at', 'end_date', 'status', 'updated_at']
+        fields = ['id', 'user', 'name', 'description', 'created_at', 'finished_at', 'end_date', 'status', 'updated_at','favorite']
         read_only_fields = ['id', 'created_at','updated_at','user']
 
     def validate_end_date(self, value):

@@ -12,6 +12,7 @@ class User(AbstractBaseUser):
     cloud_url=models.URLField(verbose_name="Link de la Imagen",null=True,blank=True)
     cloud_id=models.CharField(verbose_name='ID de la Imagen',null=True,blank=True,max_length=100)
     is_email_verified=models.BooleanField(default=False,verbose_name="Email Verificado")
+    created_at=models.DateTimeField(auto_now_add=True,verbose_name="Fecha de Creación")
     USERNAME_FIELD = 'email' 
     REQUIRED_FIELDS = ['username']
 
