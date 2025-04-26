@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +14,9 @@ from django.utils.http import urlsafe_base64_decode
 #import logging
 
 #logger=logging.getLogger("app_auth_views")
+
+def cron_job(request):
+    return JsonResponse({"message":"Ok"})
 
 class UserAccountView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class=UserSerializer
