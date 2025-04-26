@@ -13,6 +13,26 @@ class TasksView(generics.ListCreateAPIView):
     def get_queryset(self):
         project_id = self.kwargs['project_id']
         return Tasks.objects.filter(project__id=project_id,project__user=self.request.user)
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            project_id = self.kwargs['project_id']
+            project = Project.objects.filter(id=project_id, user=request.user).first()
+            if not project:
+                return Response({"detail": "Proyecto no encontrado o no autorizado"}, status=status.HTTP_404_NOT_FOUND)
+            if project.status == 'completed':
+                project.status='active'
+                project.finished_at=None
+                project.save()
+            if project.status == 'stopped':
+                return Response({"detail": "No se pueden agregar tareas a un proyecto detenido"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"detail": str(e), "error": "server_error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def perform_create(self, serializer):
         project_id = self.kwargs['project_id']
@@ -25,4 +45,32 @@ class TasksDetailsView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         project_id = self.kwargs['project_id']
         return Tasks.objects.filter(project__id=project_id,project__user=self.request.user)
-
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', True)
+            instance = self.get_object()
+            project = instance.project
+            if project.status == 'completed' and request.data.get('is_completed')==False and instance.is_completed:
+                project.status='active'
+                project.finished_at=None
+                project.save()
+            if project.status in ['stopped','planning'] and request.data.get('is_completed')==True and not instance.is_completed:
+                return Response({"detail": "No se puede completar esta tarea","error":"cant_complete_task"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if request.data.get('is_completed')==True and not instance.is_completed:
+                instance.finished_at = timezone.now()
+            
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            completed_tasks = project.tasks.filter(is_completed=True).count()
+            total_tasks = project.tasks.count()
+            if completed_tasks == total_tasks and project.status != 'completed':
+                project.status = 'completed'
+                project.finished_at = timezone.now()
+                project.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": str(e), "error": "server_error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
