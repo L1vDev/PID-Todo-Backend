@@ -21,7 +21,6 @@ class UserAccountView(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user
     
     def update(self, request, *args, **kwargs):
-        #update can be partial
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -85,7 +84,13 @@ class VerifyEmailView(APIView):
             if user:
                 user.is_email_verified = True
                 user.save()
-                return Response({'details': 'Correo verificado con éxito!'},status=status.HTTP_200_OK)
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'details': 'Correo verificado con éxito!',
+                    'user':user,
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token)
+                    },status=status.HTTP_200_OK)
             return Response({'details': 'Token no valido',"error":"invalid_token"},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"details":str(e),"error":"server_error"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
