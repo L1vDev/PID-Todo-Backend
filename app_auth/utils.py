@@ -8,12 +8,13 @@ import datetime
 import os
 import uuid
 
-def send_verification_email(user,url):
+def send_verification_email(user,url,origin):
     subject = f'Verifica tu correo electrónico en {settings.SITE_NAME}'
     context = {
         "url":url,
         "user":user,
-        "site_name":settings.SITE_NAME
+        "site_name":settings.SITE_NAME,
+        "origin":origin
     }
     to_email=[user.email]
     from_email=settings.DEFAULT_FROM_EMAIL

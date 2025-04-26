@@ -41,7 +41,7 @@ class RegisterView(generics.CreateAPIView):
         
         origin = request.META.get('HTTP_ORIGIN', 'Unknown')
         verification_url = f"{origin}/auth/verify-email/{token}"
-        send_verification_email(user,verification_url)
+        send_verification_email(user,verification_url,origin)
         
         return Response({
             'message': 'Usuario creado. Por favor verifica tu correo electrónico.',
@@ -63,7 +63,7 @@ class LoginView(APIView):
                     origin = request.META.get('HTTP_ORIGIN', 'Unknown')
 
                     verification_url = f"{origin}/auth/verify-email/{token}"
-                    send_verification_email(user,verification_url)
+                    send_verification_email(user,verification_url,origin)
                     return Response({"error": "Credenciales incorrectas, se ha enviado un correo de verificación"}, status=status.HTTP_404_NOT_FOUND)
 
                 refresh = RefreshToken.for_user(user)
