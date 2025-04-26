@@ -3,10 +3,21 @@ from app_projects.models import Project
 from django.utils import timezone
 
 class ProjectSerializer(serializers.ModelSerializer):
+    completed_tasks = serializers.SerializerMethodField()
+    total_tasks = serializers.SerializerMethodField()
     class Meta:
         model = Project
-        fields = ['id', 'user', 'name', 'description', 'created_at', 'finished_at', 'end_date', 'status', 'updated_at','favorite']
-        read_only_fields = ['id', 'created_at','updated_at','user']
+        fields = ['id', 'user', 'name', 'description', 'created_at', 'finished_at', 'end_date', 'status', 'updated_at','favorite','completed_tasks','total_tasks']
+        read_only_fields = ['id', 'created_at','updated_at']
+        extra_kwargs = {
+            'user': {'write_only': True}
+        }
+
+    def get_completed_tasks(self, obj):
+        return obj.tasks.filter(is_completed=True).count()
+    
+    def get_total_tasks(self, obj):
+        return obj.tasks.count()
 
     def validate_end_date(self, value):
         if value <= timezone.now().date():

@@ -30,9 +30,13 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
             instance = self.get_object()
             if instance.status!='planning' and request.data.get('status')=='planning':
                 return Response({"detail":"No se puede cambiar el estado de un proyecto en curso a planificación","error":"cant_change_status"}, status=status.HTTP_400_BAD_REQUEST)
-            if instance.status=='completed' and request.data.get('satus')!='completed':
+            if instance.status=='completed' and request.data.get('status')!='completed':
                 return Response({"detail":"No se puede cambiar el estado de un proyecto completado","error":"cant_change_status"}, status=status.HTTP_400_BAD_REQUEST)
+            completed_tasks = instance.tasks.filter(is_completed=True).count()
+            total_tasks = instance.tasks.count()
             if request.data.get('status')=='completed' and instance.status!='completed':
+                if completed_tasks < total_tasks:
+                    return Response({"detail":"No se puede marcar un proyecto como completado si no todas las tareas están completadas","error":"cant_change_status"}, status=status.HTTP_400_BAD_REQUEST)
                 instance.finished_at = timezone.now()
             serializer = self.get_serializer(
                 instance, data=request.data, partial=partial)
