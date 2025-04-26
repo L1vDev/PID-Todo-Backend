@@ -53,12 +53,12 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         user = User.objects.get(email=email)
         token = generate_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-
+        origin=f"{request.scheme}://{request.get_host()}"
         # URL to reset the password
-        reset_url = f"{request.scheme}://{request.get_host()}/password/reset/confirm/{uid}/{token}/"
+        reset_url = f"{origin}/password/reset/confirm/{uid}/{token}/"
 
         try:
-            send_reset_password_email(user,reset_url)
+            send_reset_password_email(user,reset_url,origin)
         except Exception as e:
             print(str(e))
 

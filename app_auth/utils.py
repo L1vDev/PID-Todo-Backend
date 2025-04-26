@@ -28,12 +28,13 @@ def send_verification_email(user,url,origin):
     print(f"Verificación de email enviada al usuario: {user.username}\nEmail: {user.email}")
     return True
 
-def send_reset_password_email(user,url):
+def send_reset_password_email(user,url,origin):
     subject = f"Solicitud de restablecimiento de contraseña en {settings.SITE_NAME}"
     context = {
         "url":url,
         "user":user,
-        "site_name":settings.SITE_NAME
+        "site_name":settings.SITE_NAME,
+        "origin":origin
     }
     to_email=[user.email]
     from_email=settings.DEFAULT_FROM_EMAIL
