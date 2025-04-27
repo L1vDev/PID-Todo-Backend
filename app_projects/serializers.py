@@ -9,10 +9,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'user', 'name', 'description', 'created_at', 'finished_at', 'end_date', 'status', 'updated_at','favorite','completed_tasks','total_tasks','due_days']
-        read_only_fields = ['id', 'created_at','updated_at']
-        extra_kwargs = {
-            'user': {'write_only': True}
-        }
+        read_only_fields = ['id', 'created_at','updated_at','user']
 
     def get_completed_tasks(self, obj):
         return obj.tasks.filter(is_completed=True).count()

@@ -5,6 +5,7 @@ from app_tasks.models import Tasks
 from app_tasks.serializers import TaskSerializer
 from rest_framework.response import Response
 from app_projects.models import Project
+from django.utils import timezone
 
 class TasksView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
