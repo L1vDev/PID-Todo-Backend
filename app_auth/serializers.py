@@ -7,16 +7,10 @@ from django.utils.encoding import force_bytes
 
 class UserSerializer(serializers.ModelSerializer):
     password=serializers.CharField(write_only=True)
-    picture=serializers.ImageField(write_only=True,allow_null=True,required=False)
-    picture_url=serializers.SerializerMethodField()
+    picture=serializers.ImageField(allow_null=True,required=False)
     class Meta:
         model=User
         fields=["id","username","password","email","picture_url","picture"]
-
-    def get_picture_url(self,obj):
-        if obj.picture:
-            return obj.cloud_url
-        return None
     
     def create(self, validated_data):
         request = self.context.get('request')
