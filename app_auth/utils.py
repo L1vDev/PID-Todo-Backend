@@ -9,7 +9,7 @@ import os
 import uuid
 
 def send_verification_email(user,url,origin):
-    subject = f'Verifica tu correo electrónico en {settings.SITE_NAME}'
+    subject = f'Verify your email in {settings.SITE_NAME}'
     context = {
         "url":url,
         "user":user,
@@ -24,12 +24,10 @@ def send_verification_email(user,url,origin):
     email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
     email.attach_alternative(html_content, 'text/html')
     email.send()
-    #Almacenar en los logs
-    print(f"Verificación de email enviada al usuario: {user.username}\nEmail: {user.email}")
     return True
 
 def send_reset_password_email(user,url,origin):
-    subject = f"Solicitud de restablecimiento de contraseña en {settings.SITE_NAME}"
+    subject = f"Password reset request from {settings.SITE_NAME}"
     context = {
         "url":url,
         "user":user,
@@ -44,8 +42,6 @@ def send_reset_password_email(user,url,origin):
     email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
     email.attach_alternative(html_content, 'text/html')
     email.send()
-    #Almacenar en los logs
-    print(f"Reestablecimiento de contrasseña para el usuario {user.username} enviado")
     return True
 
 def generate_token(user):

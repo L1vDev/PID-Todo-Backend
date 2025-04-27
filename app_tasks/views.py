@@ -19,13 +19,13 @@ class TasksView(generics.ListCreateAPIView):
             project_id = self.kwargs['project_id']
             project = Project.objects.filter(id=project_id, user=request.user).first()
             if not project:
-                return Response({"detail": "Proyecto no encontrado o no autorizado"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"detail": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
             if project.status == 'completed':
                 project.status='active'
                 project.finished_at=None
                 project.save()
             if project.status == 'stopped':
-                return Response({"detail": "No se pueden agregar tareas a un proyecto detenido"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "Cannot add tasks to a stopped project"}, status=status.HTTP_400_BAD_REQUEST)
             
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -56,7 +56,7 @@ class TasksDetailsView(generics.RetrieveUpdateDestroyAPIView):
                 project.finished_at=None
                 project.save()
             if project.status in ['stopped','planning'] and request.data.get('is_completed')==True and not instance.is_completed:
-                return Response({"detail": "No se puede completar esta tarea","error":"cant_complete_task"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "Cannot complete this task","error":"cant_complete_task"}, status=status.HTTP_400_BAD_REQUEST)
             
             if request.data.get('is_completed')==True and not instance.is_completed:
                 instance.finished_at = timezone.now()

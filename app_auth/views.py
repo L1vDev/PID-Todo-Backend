@@ -11,9 +11,7 @@ from app_auth.serializers import UserSerializer, LoginSerializer, ChangePassword
 from django.contrib.auth import authenticate
 from app_auth.utils import generate_token,verify_token,send_verification_email
 from django.utils.http import urlsafe_base64_decode
-#import logging
 
-#logger=logging.getLogger("app_auth_views")
 
 def cron_job(request):
     return JsonResponse({"message":"Ok"})
@@ -48,7 +46,7 @@ class RegisterView(generics.CreateAPIView):
         send_verification_email(user,verification_url,origin)
         
         return Response({
-            'message': 'Usuario creado. Por favor verifica tu correo electrónico.',
+            'message': 'User registered successfully, please verify your email.',
             'user': serializer.data
         }, status=status.HTTP_201_CREATED)
 
@@ -68,21 +66,21 @@ class LoginView(APIView):
 
                     verification_url = f"{origin}/auth/verify-email/{token}"
                     send_verification_email(user,verification_url,origin)
-                    return Response({"error": "Credenciales incorrectas, se ha enviado un correo de verificación"}, status=status.HTTP_404_NOT_FOUND)
+                    return Response({"error": "Invalid credentials, please verify your email"}, status=status.HTTP_404_NOT_FOUND)
 
                 refresh = RefreshToken.for_user(user)
                 return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
                 })
-        return Response({"error": "Credenciales incorrectas"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid Credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyEmailView(APIView):
     def get(self, request, token):
         try:
             payload,token_is_valid=verify_token(token)
             if not token_is_valid:
-                return Response({'details': 'Token expirado',"error":"invalid_token"},status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'details': 'Expired Token',"error":"invalid_token"},status=status.HTTP_401_UNAUTHORIZED)
         
             user = User.objects.filter(pk=payload["user_id"]).first()
             if user:
@@ -90,12 +88,12 @@ class VerifyEmailView(APIView):
                 user.save()
                 refresh = RefreshToken.for_user(user)
                 return Response({
-                    'details': 'Correo verificado con éxito!',
+                    'details': 'Email verified successfully',
                     'user':UserSerializer(user).data,
                     'refresh': str(refresh),
                     'access': str(refresh.access_token)
                     },status=status.HTTP_200_OK)
-            return Response({'details': 'Token no valido',"error":"invalid_token"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'details': 'Invalid token',"error":"invalid_token"},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"details":str(e),"error":"server_error"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -133,11 +131,11 @@ class PasswordResetRequestView(generics.GenericAPIView):
         if serializer.is_valid():
             try:
                 serializer.save()
-                return Response({"detail": "Se ha enviado un correo para restablecer la contraseña."}, status=status.HTTP_200_OK)
+                return Response({"detail": "An email to reset password have been sent"}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"detail": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
             except Exception as e:
-                return Response({"detail": "Ha ocurrido un error al intentar restablecer la contraseña."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({"detail": "An error occurred while trying to reset the password."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PasswordResetConfirmView(generics.GenericAPIView):

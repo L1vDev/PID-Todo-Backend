@@ -12,13 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-#from logging import info
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
 from decouple import config
-
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,23 +24,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5^$0@x%8#vmz%l4$yb(k*8(5+ahdc90hxd*#g8zy_#_7(ug^w9'
+SECRET_KEY = config("SECRET_KEY",default='django-insecure-5^$0@x%8#vmz%l4$yb(k*8(5+ahdc90hxd*#g8zy_#_7(ug^w9')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG",default=True,cast=bool)
 WHITENOISE_MANIFEST_STRICT = False
 
-ALLOWED_HOSTS = ['*']
+ENV_HOSTS = [host.strip() for host in config('HOSTS', default='127.0.0.1').split(',')]
+ENV_SCHEMES = [scheme.strip() for scheme in config('SCHEMES', default='http').split(',')]
 
-CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = [
-    "https://synchrony-puce.vercel.app",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:8000",
-    "https://pid-todo-backend.onrender.com",
-    ]
+ALLOWED_HOSTS = ENV_HOSTS
 
+CORS_ALLOWED_ORIGINS = [
+    f"{scheme}://{host}" for scheme in ENV_SCHEMES for host in ENV_HOSTS
+]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 # Application definition
 
@@ -101,24 +95,27 @@ WSGI_APPLICATION = 'todo_pid.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# # Postgres SQL
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DATABASE_NAME', default='todo_pid'),
-#         'USER': config('DATABASE_USER', default='postgres'),
-#         'PASSWORD': config('POSTGRES_PASSWORD', default='postgres'),
-#         'HOST': config('POSTGRES_HOST', default='127.0.0.1'),
-#         'PORT': config('POSTGRES_PORT', default='5432'),
-#     }
-# }
+DATABASE_ENGINE = config('DATABASE_ENGINE', default='postgres')
 
-DATABASES = {
+if DATABASE_ENGINE == 'sqlite':
+    DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+else:
+    # Postgres SQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DATABASE_NAME', default='todo_pid'),
+            'USER': config('DATABASE_USER', default='postgres'),
+            'PASSWORD': config('POSTGRES_PASSWORD', default='postgres'),
+            'HOST': config('POSTGRES_HOST', default='127.0.0.1'),
+            'PORT': config('POSTGRES_PORT', default='5432'),
+        }
+}
 
 #Email config
 EMAIL_BACKEND = config("EMAIL_BACKEND")
@@ -127,7 +124,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
+DEFAULT_FROM_EMAIL=config('DEFAULT_FROM_EMAIL',EMAIL_HOST_USER)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
