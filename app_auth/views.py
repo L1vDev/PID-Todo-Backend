@@ -91,7 +91,7 @@ class VerifyEmailView(APIView):
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'details': 'Correo verificado con éxito!',
-                    'user':user,
+                    'user':UserSerializer(user).data,
                     'refresh': str(refresh),
                     'access': str(refresh.access_token)
                     },status=status.HTTP_200_OK)
