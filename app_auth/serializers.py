@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     picture=serializers.ImageField(allow_null=True,required=False)
     class Meta:
         model=User
-        fields=["id","username","password","email","picture_url","picture"]
+        fields=["id","username","password","email","picture"]
     
     def create(self, validated_data):
         request = self.context.get('request')
