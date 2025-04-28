@@ -56,7 +56,7 @@ class TasksDetailsView(generics.RetrieveUpdateDestroyAPIView):
                 project.status='active'
                 project.finished_at=None
                 project.save()
-            if project.status in ['stopped','planning'] and request.data.get('is_completed')==True and not instance.is_completed:
+            if project.status == 'stopped' and request.data.get('is_completed')==True and not instance.is_completed:
                 return Response({"detail": "Cannot complete this task","error":"cant_complete_task"}, status=status.HTTP_400_BAD_REQUEST)
             
             if request.data.get('is_completed')==True and not instance.is_completed:
